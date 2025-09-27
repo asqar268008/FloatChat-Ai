@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -87,12 +89,13 @@ WSGI_APPLICATION = 'test1.wsgi.application'
 #         'PORT': '3306',
 #     }
 # }
+load_dotenv()
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'userinfo',
         'USER': 'postgres',
-        'PASSWORD': '1234',
+        'PASSWORD': os.getenv("POSTGRESQL_PASSWORD"),
         'HOST': 'localhost',
         'PORT': '5432',
     },
@@ -100,13 +103,15 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'agro',
         'USER': 'postgres',
-        'PASSWORD': '1234',
+        'PASSWORD':os.getenv("POSTGRESQL_PASSWORD"),
         'HOST': 'localhost',
         'PORT': '5432',
     }
 
 }
 
+MONGO_URI = os.getenv("MONGODB_URI")
+AUTH_USER_MODEL = 'authentication.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
