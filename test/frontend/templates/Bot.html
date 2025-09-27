@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="w-100 vh-100 d-flex flex-direction-row">
+        <!-- for history -->
+        <!-- <div class="container bg-secondary w-25 vh-100">
+        </div> -->
+        <!-- for chat  -->
+         <div class="container-md vh-75 w-100 mt-3">
+            <div class="chatarea overflow-hidden" id="divb">                
+                <div class="bot  float-start w-75">
+                    <p>Hello! I'm your AI-powered guide for exploring the vast world of oceanographic data from the ARGO program. I'm here to help you discover, understand, and visualize complex marine datasets through simple, natural conversations.</p>
+                </div>
+                <div class="user float-end w-75"><!--user-->                    
+                </div>
+            </div>
+            <div class="d-flex flex-column">
+                <!-- sample prompt for users -->
+                <div id="sample" class="text-center row gap-2">
+                    <button class="btn btn-outline-primary  col-md-3 mx-md-5" onclick="samplef(this.id)" id="pro1">Compare surface salinity values   at -157°N, 22.69°E and -35.687,3.283</button>
+                    <button class="btn btn-outline-primary  col-md-3 mx-md-5" onclick="samplef(this.id)" id="pro2">Plot temperature vs. salinity scatter for profiles at -35.687,3.283 </button>
+                    <button class="btn btn-outline-primary  col-md-3 mx-md-5" onclick="samplef(this.id)" id="pro3">Show me the temperature profile at -157.988°N, 22.69°E </button>
+                </div>
+                <!-- input entering block -->
+                <div class="container fixed-bottom mb-5 d-flex flex-row align-items-center border border rounded-pill">
+                    <span class="material-icons btn btn-light rounded-circle">attach_file</span>
+                    <!-- <input type="text" class="form-control me-3 border-0 shadow-none py-2" > my code and below is chatgpt code (textarea)-->
+                    <textarea 
+                    class="form-control border-0 flex-grow-1 shadow-none"
+                    rows="1" 
+                    placeholder="Type your message..."
+                    style="resize: none; overflow:hidden;border:none;outline:none;" 
+                    oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';" 
+                    id="inputp"></textarea>
+                    <span class="material-icons btn btn-light rounded-circle" onclick="sendmessage(document.getElementById('inputp').value)">send</span>
+                </div>
+            </div>   
+         </div>
+    </div>
+    <!-- <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
+    <!-- Load Plotly -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<script>
+function samplef(uid){
+    let usinput=document.getElementById(uid).innerText;
+    document.getElementById('sample').innerHTML='';
+    console.log(usinput);
+    sendmessage(usinput);
+}
+
+function sendmessage(ip){
+    if (ip.trim().length === 0){
+        document.getElementById('inputp').value = "";
+        document.getElementById('inputp').placeholder = "Please enter valid prompt";
+        return;
+    }  
+
+    document.getElementById('sample').innerHTML=''; 
+    document.getElementById("divb").innerHTML += `
+        <div class="user float-end w-75">
+            <p class="bg-light rounded p-3">${ip}</p>
+        </div>`;
+
+    document.getElementById('inputp').value="";
+
+    const spinnerDiv = document.createElement("div");
+    spinnerDiv.className = "bot float-start w-75";
+    spinnerDiv.id = "customspinner1";
+    spinnerDiv.innerHTML = `
+        <div class="spinner-grow text-secondary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>`;
+    divb.appendChild(spinnerDiv);
+
+    fetch('http://127.0.0.1:8000/query/', {
+        method : "POST",
+        headers : {
+            "Content-Type":"application/json"
+        },
+        body : JSON.stringify({ userinput : ip })
+    })
+    .then(res => res.json())
+    .then(data => {
+        // Clear spinner
+        spinnerDiv.innerHTML = "";
+
+        // Add a container for the chart
+        let chartDiv = document.createElement("div");
+        chartDiv.id = "chart_" + Date.now(); // unique ID
+        chartDiv.style.width = "100%";
+        chartDiv.style.height = "500px";
+        spinnerDiv.appendChild(chartDiv);
+
+       
+
+        console.log("User:", data.userinput);
+        console.log("Plot Data:", data.bot_output);
+    })
+    .catch(err => {
+        spinnerDiv.innerText = "Error: " + err;
+        spinnerDiv.className = "bot float-start text-danger rounded w-75";
+    });
+}
+</script>
+
+{% endblock %}
