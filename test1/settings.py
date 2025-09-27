@@ -41,8 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'graphdisplay',
-    'frontend',
-    'bootstrap5',
     'authentication',
 ]
 
