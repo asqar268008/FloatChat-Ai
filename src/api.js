@@ -5,16 +5,42 @@ class ApiService {
         this.baseURL = API_BASE_URL;
     }
 
+    async getCSRFToken() {
+        // Get CSRF token from cookies
+        const name = 'csrftoken';
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     async request(endpoint, options = {}) {
         const url = `${this.baseURL}${endpoint}`;
+        
+        // Get CSRF token for POST requests
+        const csrfToken = await this.getCSRFToken();
+        
         const config = {
             headers: {
                 'Content-Type': 'application/json',
                 ...options.headers,
             },
-            credentials: 'include',
+            credentials: 'include', // Important for session authentication
             ...options,
         };
+
+        // Add CSRF token for POST, PUT, DELETE requests
+        if (['POST', 'PUT', 'DELETE'].includes(options.method) && csrfToken) {
+            config.headers['X-CSRFToken'] = csrfToken;
+        }
 
         if (options.body) {
             config.body = JSON.stringify(options.body);
@@ -23,7 +49,9 @@ class ApiService {
         try {
             const response = await fetch(url, config);
             
-            // Handle different response types more gracefully
+            console.log(`API ${options.method || 'GET'} ${url}:`, response.status);
+            
+            // Handle response
             const contentType = response.headers.get('content-type');
             let data;
             
@@ -31,21 +59,18 @@ class ApiService {
                 data = await response.json();
             } else {
                 const text = await response.text();
-                // Try to parse as JSON even if content-type is wrong
                 try {
                     data = text ? JSON.parse(text) : {};
                 } catch {
-                    // If it's not JSON, create a proper error object
                     throw new Error(`Server returned non-JSON response: ${text.substring(0, 100)}`);
                 }
             }
             
             if (!response.ok) {
-                // Handle different error formats
                 const errorMessage = data.error || 
                                    data.details || 
                                    data.message || 
-                                   (typeof data === 'string' ? data : 'Something went wrong');
+                                   `HTTP ${response.status}: ${response.statusText}`;
                 throw new Error(errorMessage);
             }
             
@@ -93,16 +118,20 @@ class ApiService {
         });
     }
 
-    async updateDashboardData(id, chartData) {
-        return this.request(`/dashboard-data/${id}/`, {
-            method: 'PUT',
-            body: { chart_data: chartData },
+    // AGENT INTEGRATION METHODS
+    async generateVisualization(query, filename = null) {
+        return this.request('/dashboard-data/generate_visualization/', {
+            method: 'POST',
+            body: {
+                query: query,
+                filename: filename || `chart_${Date.now()}`
+            },
         });
     }
 
-    async deleteDashboardData(id) {
-        return this.request(`/dashboard-data/${id}/`, {
-            method: 'DELETE',
+    async aiChat(query) {
+        return this.request(`/dashboard-data/ai_chat/?query=${encodeURIComponent(query)}`, {
+            method: 'GET',
         });
     }
 
@@ -131,19 +160,6 @@ class ApiService {
             method: 'POST',
             body: { latitude, longitude },
         });
-    }
-
-    // Argo Float methods
-    async getArgoFloats() {
-        return this.request('/argo-floats/');
-    }
-
-    async getFloatDetails(floatId) {
-        return this.request(`/argo-floats/${floatId}/`);
-    }
-
-    async searchFloats(query) {
-        return this.request(`/argo-floats/search/?q=${encodeURIComponent(query)}`);
     }
 }
 
