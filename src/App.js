@@ -37,21 +37,28 @@ function App() {
         setShowLoginModal(false);
     };
 
+    // --- CORRECTED LOGOUT FUNCTION ---
     const handleLogout = async () => {
         try {
             await ApiService.logout();
+            console.log('User logged out successfully');
+        } catch (error) {
+            console.error('Logout API call failed:', error);
+            // Continue with frontend logout even if API fails
+        } finally {
+            // This block will run regardless of API success or failure
             setLoggedIn(false);
             setUser(null);
-            setCurrentView('dashboard');
+            setCurrentView('dashboard'); // Always return to a safe, public view
+            
+            // Clear all storage to ensure complete logout
             localStorage.clear();
             sessionStorage.clear();
-            console.log('User logged out successfully');
-
-        } catch (error) {
-            console.error('Logout failed:', error);
-            setLoggedIn(false);
-            setUser(null);
-            setCurrentView('dashboard');
+            
+            // Force a page reload to clear any cached state
+            setTimeout(() => {
+                window.location.reload();
+            }, 100);
         }
     };
 
@@ -80,16 +87,16 @@ function App() {
             {/* Header Navigation */}
             <header className="app-header">
                 <div className="header-left">
-                    <h1 className="app-title">FloatTrack Analytics</h1>
+                    <h1 className="app-title">Floatchat AI</h1>
                     <nav className="nav-menu">
                         <button 
-                            className={`nav-btn ${currentView === 'dashboard' ? 'active' : ''}`}
+                            className={`nav-btn ${currentView === 'dashboard' ? 'active' : ''}`}  
                             onClick={() => handleViewChange('dashboard')}
                         >
                             Dashboard
                         </button>
                         <button 
-                            className={`nav-btn ${currentView === 'map' ? 'active' : ''}`}
+                            className={`nav-btn ${currentView === 'map' ? 'active' : ''}`}  
                             onClick={() => handleViewChange('map')}
                             disabled={!loggedIn}
                             title={!loggedIn ? "Please login to access Live Map" : ""}
