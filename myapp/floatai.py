@@ -126,12 +126,16 @@ def llm(state:AgentState)-> AgentState:
     df=pd.read_csv("ARGODATA.csv")
     pr=prom.from_template("""Request by user:\n {question} generate python code .save the result in name user as a json  for graph or html for map only dont use any other name "
     the data schema  are{df}
-     use the column name only given in the above data   schemma 
-                          try to write code to fullfill user request partially""")
+    try to write python code to complete partial request if data does not completlty present
+    in code remove the duplicate based on x axis if data row  length is big >15
+    use common name for axis label eg EXFatemp as Temperature
+    data shape is {shape} ,always add legend to the graph
+    if data row  length is small <15 and you need to do line plot mean  write code for scatter
+     use the column name only given in the above data schemma """)
 
     if state["visual"]=='1' :
         
-        p=pr.format(question=state["graph"][-1].content,df=df.head())
+        p=pr.format(question=state["graph"][-1].content,df=df.head(),shape=df.shape)
         state["graph"][-1]=HumanMessage(p)
         result=chat1.invoke(state["graph"])
         state["graph"].append(result)

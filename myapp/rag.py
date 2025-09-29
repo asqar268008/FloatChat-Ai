@@ -1,4 +1,6 @@
 import os
+import webbrowser
+import base64
 import pandas as pd
 from langchain_core.prompts import PromptTemplate as prom
 from langgraph.graph import StateGraph, END
@@ -10,7 +12,9 @@ from langchain_community.document_loaders.text import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
 from langchain_mistralai import MistralAIEmbeddings
+from .datadb import db
 
+dbs = db()
 
 class AgentState(TypedDict):
             messages: Sequence[BaseMessage]
@@ -186,8 +190,9 @@ class RAGService:
         
         result = self.chat1.invoke(state["user"])
         state["user"].append(result)
-        state['result'] = result.content
-        state["view"].append(result)   
+        #state['result'] = "the data is ready click link to downoad" #it is output
+        state["view"].append(result) 
+        state['result']=result.content  
         print(state['result'])
         return state
     
@@ -219,12 +224,45 @@ class RAGService:
         WHERE EXTRACT(YEAR FROM time) = 2024
         AND latitude  BETWEEN 8.0  AND 13.5   
         AND longitude BETWEEN 76.5 AND 80.5   
-                              """)
+        always generate query in sql syntax 
+                                dont generate empty query        """)
         p = pr.format(question=state["data"][-1].content)
         state["data"][-1] = HumanMessage(content=p)
         result = self.chat.invoke(state["data"])
         print(result.content)
         # we need to add
+        state['result']=result.content
+        raw = str(state['result'])
+        code_block = raw[raw.index("SELECT"):]
+        code_block = code_block[:code_block.index(";")+1] if ";" in code_block else code_block
+        print('l',code_block)
+        l=dbs.exec1(code_block)
+        print(l)
+        state['result']="data is delivered click link to download"
+        csv = l.to_csv(index=False)
+        b64 = base64.b64encode(csv.encode()).decode()
+
+# Generate HTML link
+        html_link = f'''
+        <html>
+        <head><title>Download CSV</title></head>
+        <body>
+            <h2>Argo Data Export</h2>
+            <a href="data:file/csv;base64,{b64}" download="argo_export.csv"> Click to Download CSV which you requested </a>
+        </body>
+        </html>
+        '''
+        with open("download_demo.html", "w", encoding="utf-8") as f:
+            f.write(html_link)
+        html_file = "download_demo.html"
+        state["view"].append(AIMessage(content="✅ HTML download link generated. Open 'download_demo.html' in your browser."))
+        print("✅ HTML download link generated. Open 'download_demo.html' in your browser.")
+        file_url = f"file://{os.path.abspath(html_file)}"
+
+# Open in a new browser tab
+        webbrowser.open_new_tab(file_url)
+
+        print("✅ HTML file opened in your default browser.")
         return state
     
     def autom(self, state: AgentState) -> AgentState:

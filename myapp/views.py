@@ -161,7 +161,8 @@ class DashboardDataViewSet(viewsets.ModelViewSet):
             chat_message = ChatMessage.objects.create(
                 user=request.user,
                 message=user_query,
-                response=rag_response
+                response=rag_response,
+                # is_rag=True
             )
             
             return Response({
