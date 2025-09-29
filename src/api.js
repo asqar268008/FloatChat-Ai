@@ -161,6 +161,13 @@ class ApiService {
             body: { latitude, longitude },
         });
     }
+
+    async ragChat(query) {
+        return this.request('/dashboard-data/rag_chat/', {
+            method: 'POST',
+            body: { query : query },
+        });
+    }
 }
 
 export default new ApiService();

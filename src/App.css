@@ -474,3 +474,282 @@ body {
   0%, 60%, 100% { transform: translateY(0); }
   30% { transform: translateY(-4px); }
 }
+
+/* Add these new styles for RAG-enhanced chatbot features */
+/* --- RAG Chatbot Enhanced Styles --- */
+.chatbot-header {
+    position: relative;
+}
+
+.chatbot-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.chatbot-subtitle {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    font-weight: normal;
+}
+
+.clear-chat-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.7rem;
+}
+
+.clear-chat-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.message {
+    position: relative;
+    margin: 8px;
+    padding: 12px;
+    border-radius: 15px;
+    max-width: 85%;
+    word-wrap: break-word;
+}
+
+.message.user {
+    background: #007bff;
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 5px;
+}
+
+.message.bot {
+    background: #f1f3f4;
+    color: #333;
+    margin-right: auto;
+    border-bottom-left-radius: 5px;
+}
+
+.message-content {
+    line-height: 1.4;
+    font-size: 0.9rem;
+}
+
+.message-time {
+    font-size: 0.7rem;
+    opacity: 0.6;
+    margin-top: 5px;
+    text-align: right;
+}
+
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 5px 0;
+}
+
+.typing-indicator span {
+    height: 6px;
+    width: 6px;
+    background: #666;
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing {
+    0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
+.input-container {
+    display: flex;
+    gap: 10px;
+    padding: 15px;
+}
+
+.message-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    outline: none;
+    font-size: 0.9rem;
+}
+
+.message-input:focus {
+    border-color: #007bff;
+}
+
+.send-button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    min-width: 60px;
+    font-size: 0.9rem;
+}
+
+.send-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.send-button:not(:disabled):hover {
+    background: #0056b3;
+}
+
+.suggestions {
+    padding: 0 15px 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.suggestion-label {
+    font-size: 0.75rem;
+    color: #666;
+    margin-right: 5px;
+}
+
+.suggestion-chip {
+    background: #e9ecef;
+    border: 1px solid #dee2e6;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    color: #495057;
+    transition: background-color 0.2s;
+}
+
+.suggestion-chip:hover {
+    background: #dee2e6;
+}
+
+/* Float popup enhancements */
+.float-popup {
+    min-width: 180px;
+    font-size: 0.9rem;
+}
+
+.popup-chat-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 8px;
+    width: 100%;
+    font-size: 0.8rem;
+    transition: background-color 0.2s;
+}
+
+.popup-chat-btn:hover {
+    background: #0056b3;
+}
+
+/* Custom div icon for map markers */
+.custom-div-icon {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Enhanced resizer for better visibility */
+.resizer {
+    width: 4px;
+    background: #ddd;
+    cursor: col-resize;
+    transition: background 0.2s;
+    flex-shrink: 0;
+    z-index: 1001;
+}
+
+.resizer:hover {
+    background: #007bff;
+}
+
+/* Ensure map container takes full space */
+.map-container {
+    flex: 1;
+    height: 100%;
+    position: relative;
+}
+
+/* RAG-specific message styling */
+.message.rag-enhanced {
+    border-left: 3px solid #2a9d8f;
+}
+
+.message.context-aware {
+    background: linear-gradient(135deg, #f1f3f4 0%, #e8f4f8 100%);
+}
+
+/* Loading states for RAG queries */
+.rag-loading {
+    opacity: 0.7;
+}
+
+.rag-error {
+    background: #fee;
+    border: 1px solid #fcc;
+    color: #c33;
+}
+
+/* Responsive adjustments for chatbot */
+@media (max-width: 768px) {
+    .chatbot-sidebar {
+        width: 100% !important;
+    }
+    
+    .suggestions {
+        justify-content: center;
+    }
+    
+    .suggestion-label {
+        display: none;
+    }
+}
+
+/* Smooth transitions for chat interactions */
+.messages-list {
+    scroll-behavior: smooth;
+}
+
+.message {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scrollbar styling for messages */
+.messages-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.messages-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.messages-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.messages-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}

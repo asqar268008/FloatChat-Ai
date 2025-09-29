@@ -6,6 +6,7 @@ from django.contrib.auth import login, logout
 from .models import User, DashboardData, ChatMessage, LocationData
 from .serializers import *
 from .agent import func
+from .rag import rag_service
 import os
 import json
 
@@ -138,6 +139,41 @@ class DashboardDataViewSet(viewsets.ModelViewSet):
             print(f"Error in ai_chat: {str(e)}")
             return Response({
                 'error': f'AI chat error: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    # NEW: RAG Chat endpoint - added without changing existing code
+    @action(detail=False, methods=['post'])
+    def rag_chat(self, request):
+        """RAG-based chat endpoint for LiveMapView"""
+        try:
+            user_query = request.data.get('query', '')
+            if not user_query:
+                return Response({
+                    'error': 'Query is required'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            print(f"RAG Chat request from user {request.user.id}: {user_query}")
+            
+            # Use RAG service for response
+            rag_response = rag_service.query(user_query)
+            
+            # Create chat message record
+            chat_message = ChatMessage.objects.create(
+                user=request.user,
+                message=user_query,
+                response=rag_response
+            )
+            
+            return Response({
+                'response': rag_response,
+                'query': user_query,
+                'message_id': chat_message.id
+            })
+            
+        except Exception as e:
+            print(f"Error in rag_chat: {str(e)}")
+            return Response({
+                'error': f'RAG chat error: {str(e)}'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ChatMessageViewSet(viewsets.ModelViewSet):

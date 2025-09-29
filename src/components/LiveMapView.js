@@ -57,15 +57,48 @@ const LiveMapView = () => {
         setChatLoading(true);
         
         try {
-            // isDashboard is explicitly false for this component
-            const response = await ApiService.sendChatMessage(query, false); 
-            const botMessage = { sender: 'bot', text: response.response };
-            setMessages(prev => [...prev, botMessage]);
-            // Future logic for map interactions (like zooming to a float) could go here
+            // NEW: Use RAG service for ocean-related queries
+            const oceanKeywords = ['argo', 'float', 'ocean', 'temperature', 'salinity', 'pressure', 
+                                  'latitude', 'longitude', 'indian ocean', 'atlantic', 'pacific',
+                                  'sea', 'marine', 'buoy', 'sensor', 'depth', 'current', 'wave',
+                                  'climate', 'weather', 'hydrographic', 'oceanographic'];
+            const isOceanQuery = oceanKeywords.some(keyword => 
+                query.toLowerCase().includes(keyword.toLowerCase())
+            );
+            
+            let response;
+            
+            if (isOceanQuery) {
+                try {
+                    // Try RAG service first for ocean queries
+                    console.log('Using RAG service for query:', query);
+                    response = await ApiService.ragChat(query);
+                    console.log('RAG response:', response);
+                } catch (ragError) {
+                    console.log('RAG service failed, using regular chat:', ragError);
+                    // Fallback to regular chat
+                    response = await ApiService.sendChatMessage(query, false);
+                }
+            } else {
+                // Use regular chat for general queries
+                console.log('Using regular chat for query:', query);
+                response = await ApiService.sendChatMessage(query, false);
+            }
+            
+            if (response && response.response) {
+                const botMessage = { sender: 'bot', text: response.response };
+                setMessages(prev => [...prev, botMessage]);
+            } else {
+                throw new Error('No valid response from server');
+            }
+            
         } catch (error) {
             console.error('Failed to send message:', error);
-            const errorMessage = { sender: 'bot', text: `Sorry, I encountered an error: ${error.message}` };
-            setMessages(prev => [...prev, errorMessage]);
+            const errorMessage = { 
+            sender: 'bot', 
+            text: `I apologize, but I'm having trouble accessing the ocean database right now. Please try again in a moment.` 
+        };
+        setMessages(prev => [...prev, errorMessage]);
         } finally {
             setChatLoading(false);
         }
@@ -149,4 +182,3 @@ const LiveMapView = () => {
 };
 
 export default LiveMapView;
-
