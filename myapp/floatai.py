@@ -5,6 +5,7 @@ import plotly.io as pio
 import plotly.express as px
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
+import seaborn as sns
 import os
 import subprocess
 import pandas as pd
@@ -83,6 +84,7 @@ output-"SELECT *
     WHERE EXTRACT(YEAR FROM time) = 2024
     AND latitude  BETWEEN 8.0  AND 13.5   
     AND longitude BETWEEN 76.5 AND 80.5   
+Always generate query in sql format
 
                        """)
     p=pr.format(question=state['retrive1'][-1].content)
@@ -106,12 +108,15 @@ def listen(state:AgentState)-> AgentState:
     """ it listen the user words and define question"""
     print("Analysing......")
     result=chat.invoke(state["messages"])
-
+    print(result.content)
     l=result.content.split('\n')
-    
-    state["visual"]=l[-1].strip()
+    print(l)
+    flag = l[-1].strip() if len(l) > 1 else '0'
+    print(flag)
+    state["visual"]=flag
     state['messages'].append(result)
     state['retrive1'].append(HumanMessage(result.content))
+    print(state["visual"])
     if state["visual"]=='1':
         
         state["graph"].append(HumanMessage(result.content))
@@ -127,11 +132,12 @@ def llm(state:AgentState)-> AgentState:
     pr=prom.from_template("""Request by user:\n {question} generate python code .save the result in name user as a json  for graph or html for map only dont use any other name "
     the data schema  are{df}
     try to write python code to complete partial request if data does not completlty present
-    in code remove the duplicate based on x axis if data row  length is big >15
+   
     use common name for axis label eg EXFatemp as Temperature
     data shape is {shape} ,always add legend to the graph
     if data row  length is small <15 and you need to do line plot mean  write code for scatter
-     use the column name only given in the above data schemma """)
+   in code remove the duplicate based on x axis if data row  length is big >15
+     use the column name only given in the above data schemma for boxplot,piechart use seaborn or matplotlib""")
 
     if state["visual"]=='1' :
         
@@ -184,6 +190,7 @@ def executor(state: AgentState) -> AgentState:
             "go": go,
             "pio": pio,
             "json": json,
+            'sns': sns,
             "print": safe_print,
         }
 

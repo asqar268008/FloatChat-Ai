@@ -128,6 +128,7 @@ Rules:
 Visualization tasks-1:
 - Identify chart type (lineplot, bar chart, histogram, pie chart, etc.).
 - Specify variables for x-axis and y-axis when relevant.
+-boxplot,piechart use seaborn or matplotlib
 - Use direct, simple phrasing (e.g., "Plot lineplot using temperature over month").
 
 Data operation tasks-2:
@@ -166,6 +167,7 @@ User: "Show me the crosstab in temp Qc ,pres Qc"
 Output: "Return the Crosstab for column temperature_qc, pressure_qc \n 2"
 
 If the input is ambiguous, make the best guess based on common usage patterns. Do not ask clarifying questions,dont give empty text.
+dont generate empty string try to fullfill partial instruction
 """
 switch="""You are a strict PostgreSQL administrator responsible for managing and retrieving ARGO oceanographic data for processing data or visualization. Your role is to interpret user queries expressed in multiple languages—including regional dialects for generating graphs or data process and generate precise, executable SQL queries.
  You must understand geospatial, temporal, and environmental parameters embedded in the request and translate them into optimized SQL statements.
@@ -188,9 +190,7 @@ data schema-
                             longitude_bnds	float64	
 
 Do Not Generate Empty Queries
-If the user's input lacks sufficient context (e.g., no location, time range, or variable specified), respond with a clear error message: "Query rejected: insufficient parameters. Please specify location, time range, or variable of interest."
-Reject Ambiguous or Vague Requests
-Do not guess. If the query is unclear, ask for clarification in the user's language before generating SQL.
+
 Validate Geospatial Inputs
 Ensure latitude and longitude filters are present and within valid bounds (e.g., -90 to 90 for latitude).
 Enforce Temporal Constraints
