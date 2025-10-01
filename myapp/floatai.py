@@ -55,6 +55,7 @@ class AgentState(TypedDict):
 def dataqu(state:AgentState)->AgentState:
     """it handle SQL query"""
     global chat
+    print("retrieve data....")
     pr=prom.from_template("""Request by user:\n {question}
                           table name argodata 
                           interprupt question based on user the data schema  are
@@ -83,18 +84,20 @@ output-"SELECT *
     FROM  Argo_table
     WHERE EXTRACT(YEAR FROM time) = 2024
     AND latitude  BETWEEN 8.0  AND 13.5   
-    AND longitude BETWEEN 76.5 AND 80.5   
+    AND longitude BETWEEN 76.5 AND 80.5 
+                          user ask complex question in multilingual
+                          you need to interprut the question and generate query  
 Always generate query in sql format
 
                        """)
     p=pr.format(question=state['retrive1'][-1].content)
     state['retrive1'][-1]=HumanMessage(content=p)
     result=chat.invoke(state['retrive1'])
-    #print(result.content)
+    print(result.content)
     state['query']=result.content
     raw = str(state['query'])
     code_block = raw[raw.index("SELECT"):]
-    code_block = code_block[:code_block.index("```")] if "```" in code_block else code_block
+    code_block = code_block[:code_block.index(";")+1] if ";" in code_block else code_block
     
     state['query']=code_block
     print(code_block)

@@ -18,7 +18,7 @@ const DashboardView = ({ demoMode = false }) => {
         setMessages([
             { 
                 sender: 'bot', 
-                text: 'Hello! I can generate charts and analyze ARGO ocean data. Try: "Show me temperature data as a line chart" or "Create a bar chart of humidity values"' 
+                text: 'Hello! I can generate charts and analyze ARGO ocean data.' 
             }
         ]);
         
@@ -163,8 +163,8 @@ const DashboardView = ({ demoMode = false }) => {
                     {/* --- Integrated Chatbot JSX --- */}
                     <div className="chatbot-container">
                         <div className="chatbot-header">
-                            <h3>FloatChat AI</h3>
-                            <div className="chatbot-subtitle">Data Analysis & Visualization</div>
+                            <h3>Data Analysis & Visualization</h3>
+                            
                         </div>
                         
                         {error && (
@@ -198,7 +198,7 @@ const DashboardView = ({ demoMode = false }) => {
                             <div className="input-group">
                                 <input 
                                     type="text" 
-                                    placeholder="e.g., Show temperature data as line chart" 
+                                    placeholder="Ask me to analyze" 
                                     value={inputValue} 
                                     onChange={(e) => setInputValue(e.target.value)}
                                     disabled={chatLoading}
@@ -235,10 +235,9 @@ const DashboardView = ({ demoMode = false }) => {
                                 <div className="suggestions">
                                     <p><strong>Try asking:</strong></p>
                                     <ul>
-                                        <li>"Show me temperature data as a line chart"</li>
-                                        <li>"Create a bar chart of humidity values"</li>
-                                        <li>"Plot wind speed over time"</li>
-                                        <li>"Generate scatter plot of temperature vs pressure"</li>
+                                        <li>"Show me temperature data as a line chart at atlantic ocean in 2005"</li>
+                                        <li>"Create a graph for distribution of humidity values at pacific ocean in 2006"</li>
+                                        <li>"Plot wind speed over time at indian ocean in 2007"</li>
                                     </ul>
                                 </div>
                             </div>

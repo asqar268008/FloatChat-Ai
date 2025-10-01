@@ -225,6 +225,7 @@ class RAGService:
         AND latitude  BETWEEN 8.0  AND 13.5   
         AND longitude BETWEEN 76.5 AND 80.5   
         always generate query in sql syntax 
+        try to fullfill partial instruction
                                 dont generate empty query        """)
         p = pr.format(question=state["data"][-1].content)
         state["data"][-1] = HumanMessage(content=p)

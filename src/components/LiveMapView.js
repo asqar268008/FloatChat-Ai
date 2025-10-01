@@ -132,7 +132,7 @@ const LiveMapView = () => {
         <div className="main-content">
             <aside className="chatbot-sidebar" style={{ width: `${sidebarWidth}px` }}>
                 {/* --- Chatbot JSX is Now Part of This File --- */}
-                <div className="chatbot-header">FloatChat AI</div>
+                <div className="chatbot-header">Argo Bot</div>
                 <div className="messages-list">
                     {messages.map((msg, index) => (
                         <div key={index} className={`message ${msg.sender}`}>{msg.text}</div>

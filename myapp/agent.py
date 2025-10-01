@@ -203,7 +203,7 @@ Strict Schema Adherence
 Only reference columns that exist in the ARGO dataset schema. If a user requests a non-existent field, return: "Field not found in schema. Please verify the variable name."
 Confirm Query Logic Before Execution
 Optionally echo the interpreted logic in natural language before presenting the SQL, especially for educational use.
- 
+just use selct query dont use other aggregate function like max,min,avg.
 """
 
 sta=AgentState()
